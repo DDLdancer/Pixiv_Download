@@ -11,7 +11,8 @@ IMAGE_FOLDER="images/"
 AUTH_SLEEPTIME_MIN=5
 AUTH_SLEEPTIME_MAX=20
 
-DOWNLOAD_SLEEPTIME=1
+DOWNLOAD_SLEEPTIME_MIN=5
+DOWNLOAD_SLEEPTIME_MAX=10
 
 api = pixivpy3.AppPixivAPI()
 
@@ -41,7 +42,7 @@ def download_illust(illust_id):
     for meta_page in json_result.illust.meta_pages[:]:
         api.download(meta_page.image_urls['original'], path=title)
         print("one image downloaded to", title)
-        sleep(DOWNLOAD_SLEEPTIME)
+        sleep(random.randint(DOWNLOAD_SLEEPTIME_MIN, DOWNLOAD_SLEEPTIME_MAX))
 
 
 def download_author(author_id):
@@ -52,18 +53,14 @@ def download_author(author_id):
 
 if __name__ == "__main__":
     authorization()
-    
-    if sys.argv[1] == "illust":
+
+    if len(sys.argv) >= 2:
+        download_author(int(sys.argv[2]))
+
+    else:
         while True:
             illust_id = int(input())
             if illust_id != 0:
                 download_illust(illust_id)
             else:
                 break
-
-    elif sys.argv[1] == "author":
-        download_author(int(sys.argv[2]))
-
-    else:
-        print("function not supported")
-        exit(1)
