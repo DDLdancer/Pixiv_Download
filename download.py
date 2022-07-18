@@ -4,6 +4,7 @@ import pixivpy3
 import os
 import sys
 import random
+import datetime
 
 REFRESH_TOKEN_FILE="token.txt"
 IMAGE_FOLDER="images/"
@@ -37,7 +38,7 @@ def check_create_dir(path):
 
 def download_url(url, path):
     api.download(url, path=path)
-    print("one image downloaded to", path)
+    print(datetime.datetime.now().strftime("%H:%M:%S"), "image downloaded to", path)
     sleep(random.randint(DOWNLOAD_SLEEPTIME_MIN, DOWNLOAD_SLEEPTIME_MAX))
 
 
