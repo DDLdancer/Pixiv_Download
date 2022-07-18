@@ -35,14 +35,24 @@ def check_create_dir(path):
         os.makedirs(path)
 
 
+def download_url(url, path):
+    api.download(url, path=path)
+    print("one image downloaded to", path)
+    sleep(random.randint(DOWNLOAD_SLEEPTIME_MIN, DOWNLOAD_SLEEPTIME_MAX))
+
+
 def download_illust(illust_id):
     json_result = api.illust_detail(illust_id)
     title = IMAGE_FOLDER + json_result.illust.user.name + "/" + json_result.illust.title
     check_create_dir(title)
+
+    single_page = json_result.illust.meta_single_page
+    if single_page != {}:
+        download_url(single_page.original_image_url , title)
+
     for meta_page in json_result.illust.meta_pages[:]:
-        api.download(meta_page.image_urls['original'], path=title)
-        print("one image downloaded to", title)
-        sleep(random.randint(DOWNLOAD_SLEEPTIME_MIN, DOWNLOAD_SLEEPTIME_MAX))
+        download_url(meta_page.image_urls['original'], title)
+
     print(title, "download complete!")
 
 
