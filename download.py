@@ -11,8 +11,8 @@ IMAGE_FOLDER="images/"
 AUTH_SLEEPTIME_MIN=5
 AUTH_SLEEPTIME_MAX=20
 
-DOWNLOAD_SLEEPTIME_MIN=5
-DOWNLOAD_SLEEPTIME_MAX=10
+DOWNLOAD_SLEEPTIME_MIN=2
+DOWNLOAD_SLEEPTIME_MAX=5
 
 api = pixivpy3.AppPixivAPI()
 
@@ -43,6 +43,7 @@ def download_illust(illust_id):
         api.download(meta_page.image_urls['original'], path=title)
         print("one image downloaded to", title)
         sleep(random.randint(DOWNLOAD_SLEEPTIME_MIN, DOWNLOAD_SLEEPTIME_MAX))
+    print(title, "download complete!")
 
 
 def download_author(author_id):
