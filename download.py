@@ -4,6 +4,7 @@ import pixivpy3
 import os
 import sys
 import random
+import datetime
 
 REFRESH_TOKEN_FILE="token.txt"
 IMAGE_FOLDER="images/"
@@ -11,7 +12,8 @@ IMAGE_FOLDER="images/"
 AUTH_SLEEPTIME_MIN=5
 AUTH_SLEEPTIME_MAX=20
 
-DOWNLOAD_SLEEPTIME=1
+DOWNLOAD_SLEEPTIME_MIN=2
+DOWNLOAD_SLEEPTIME_MAX=5
 
 api = pixivpy3.AppPixivAPI()
 
@@ -34,14 +36,25 @@ def check_create_dir(path):
         os.makedirs(path)
 
 
+def download_url(url, path):
+    api.download(url, path=path)
+    print(datetime.datetime.now().strftime("%H:%M:%S"), "image downloaded to", path)
+    sleep(random.randint(DOWNLOAD_SLEEPTIME_MIN, DOWNLOAD_SLEEPTIME_MAX))
+
+
 def download_illust(illust_id):
     json_result = api.illust_detail(illust_id)
     title = IMAGE_FOLDER + json_result.illust.user.name + "/" + json_result.illust.title
     check_create_dir(title)
+
+    single_page = json_result.illust.meta_single_page
+    if single_page != {}:
+        download_url(single_page.original_image_url , title)
+
     for meta_page in json_result.illust.meta_pages[:]:
-        api.download(meta_page.image_urls['original'], path=title)
-        print("one image downloaded to", title)
-        sleep(DOWNLOAD_SLEEPTIME)
+        download_url(meta_page.image_urls['original'], title)
+
+    print(title, "download complete!")
 
 
 def download_author(author_id):
@@ -52,18 +65,14 @@ def download_author(author_id):
 
 if __name__ == "__main__":
     authorization()
-    
-    if sys.argv[1] == "illust":
+
+    if len(sys.argv) >= 2:
+        download_author(int(sys.argv[2]))
+
+    else:
         while True:
             illust_id = int(input())
             if illust_id != 0:
                 download_illust(illust_id)
             else:
                 break
-
-    elif sys.argv[1] == "author":
-        download_author(int(sys.argv[2]))
-
-    else:
-        print("function not supported")
-        exit(1)
