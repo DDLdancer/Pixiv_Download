@@ -27,7 +27,7 @@ def authorization():
             break
         except pixivpy3.utils.PixivError:
             print("Authorization failed, try again")
-            sleep(random.randint(AUTH_SLEEPTIME_MIN, AUTH_SLEEPTIME_MAX))
+            sleep(random.uniform(AUTH_SLEEPTIME_MIN, AUTH_SLEEPTIME_MAX))
 
 
 def check_create_dir(path):
@@ -38,7 +38,7 @@ def check_create_dir(path):
 def download_url(url, path):
     api.download(url, path=path)
     print(datetime.datetime.now().strftime("%H:%M:%S"), "image downloaded to", path)
-    sleep(random.randint(DOWNLOAD_SLEEPTIME_MIN, DOWNLOAD_SLEEPTIME_MAX))
+    sleep(random.uniform(DOWNLOAD_SLEEPTIME_MIN, DOWNLOAD_SLEEPTIME_MAX))
 
 
 def download_illust(illust_id):
