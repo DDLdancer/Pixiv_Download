@@ -30,11 +30,6 @@ def authorization():
             sleep(random.uniform(AUTH_SLEEPTIME_MIN, AUTH_SLEEPTIME_MAX))
 
 
-def check_create_dir(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
-
-
 def download_url(url, path):
     api.download(url, path=path)
     print(datetime.datetime.now().strftime("%H:%M:%S"), "image downloaded to", path)
@@ -44,7 +39,13 @@ def download_url(url, path):
 def download_illust(illust_id):
     json_result = api.illust_detail(illust_id)
     title = IMAGE_FOLDER + json_result.illust.user.name + "/" + json_result.illust.title
-    check_create_dir(title)
+
+    # Will not download again if the artwork already exists
+    if os.path.exists(title):
+        print(title, "already exists!")
+        return
+    else:
+        os.makedirs(title)
 
     single_page = json_result.illust.meta_single_page
     if single_page != {}:
