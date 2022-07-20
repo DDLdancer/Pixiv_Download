@@ -17,22 +17,26 @@ DOWNLOAD_SLEEPTIME_MAX=5
 api = pixivpy3.AppPixivAPI()
 
 
+def info(s):
+    print(datetime.datetime.now().strftime("%H:%M:%S"), s)
+
+
 def authorization():
     with open(REFRESH_TOKEN_FILE, 'r', encoding="utf-8") as f:
         refresh_token = f.readline()[:-1]
     while True:
         try:
             api.auth(refresh_token=refresh_token)
-            print("Login success!")
+            info("Login success!")
             break
         except pixivpy3.utils.PixivError:
-            print("Authorization failed, try again")
+            info("Authorization failed, try again")
             sleep(random.uniform(AUTH_SLEEPTIME_MIN, AUTH_SLEEPTIME_MAX))
 
 
 def download_url(url, path):
     api.download(url, path=path)
-    print(datetime.datetime.now().strftime("%H:%M:%S"), "image downloaded to", path)
+    info("image downloaded to " + path)
     sleep(random.uniform(DOWNLOAD_SLEEPTIME_MIN, DOWNLOAD_SLEEPTIME_MAX))
 
 
@@ -42,7 +46,7 @@ def download_illust(illust_id):
 
     # Will not download again if the artwork already exists
     if os.path.exists(title):
-        print(title, "already exists!")
+        info(title + " already exists!")
         return
     else:
         os.makedirs(title)
@@ -54,7 +58,7 @@ def download_illust(illust_id):
     for meta_page in json_result.illust.meta_pages[:]:
         download_url(meta_page.image_urls['original'], title)
 
-    print(title, "download complete!")
+    info(title + " download complete!")
 
 
 def download_author(author_id):
@@ -64,9 +68,12 @@ def download_author(author_id):
 
 
 def download_bookmark(user_id):
-    json_result = api.user_bookmarks_illust(user_id)
-    for illust in json_result.illusts[:]:
-        download_illust(illust.id)
+    next_qs = {'user_id': user_id }
+    while next_qs is not None:
+        json_result = api.user_bookmarks_illust(**next_qs)
+        for illust in json_result.illusts[:]:
+            download_illust(illust.id)
+        next_qs = api.parse_qs(json_result.next_url)
 
 
 if __name__ == "__main__":
