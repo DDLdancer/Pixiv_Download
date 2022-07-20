@@ -7,7 +7,7 @@ import datetime
 from tqdm import tqdm
 
 REFRESH_TOKEN_FILE="token.txt"
-IMAGE_FOLDER="images/"
+IMAGE_FOLDER="images"
 
 AUTH_SLEEPTIME_MIN=5
 AUTH_SLEEPTIME_MAX=20
@@ -42,7 +42,8 @@ def download_url(url, path):
 
 def download_illust(illust_id):
     json_result = api.illust_detail(illust_id)
-    title = IMAGE_FOLDER + json_result.illust.user.name + "/" + json_result.illust.title
+    title = IMAGE_FOLDER + "/" + \
+    "[" + json_result.illust.user.name + "]" + json_result.illust.title
 
     # Will not download again if the artwork already exists
     if os.path.exists(title):
@@ -89,7 +90,7 @@ if __name__ == "__main__":
 
     else:
         while True:
-            illust_id = int(input("Please enter illust id:"))
+            illust_id = int(input("Please enter illust id: "))
             if illust_id != 0:
                 download_illust(illust_id)
             else:
