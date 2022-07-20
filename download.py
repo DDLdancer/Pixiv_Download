@@ -4,6 +4,7 @@ import os
 import sys
 import random
 import datetime
+from tqdm import tqdm
 
 REFRESH_TOKEN_FILE="token.txt"
 IMAGE_FOLDER="images/"
@@ -11,8 +12,8 @@ IMAGE_FOLDER="images/"
 AUTH_SLEEPTIME_MIN=5
 AUTH_SLEEPTIME_MAX=20
 
-DOWNLOAD_SLEEPTIME_MIN=2
-DOWNLOAD_SLEEPTIME_MAX=5
+DOWNLOAD_SLEEPTIME_MIN=1
+DOWNLOAD_SLEEPTIME_MAX=2
 
 api = pixivpy3.AppPixivAPI()
 
@@ -36,7 +37,6 @@ def authorization():
 
 def download_url(url, path):
     api.download(url, path=path)
-    info("image downloaded to " + path)
     sleep(random.uniform(DOWNLOAD_SLEEPTIME_MIN, DOWNLOAD_SLEEPTIME_MAX))
 
 
@@ -55,8 +55,10 @@ def download_illust(illust_id):
     if single_page != {}:
         download_url(single_page.original_image_url , title)
 
-    for meta_page in json_result.illust.meta_pages[:]:
-        download_url(meta_page.image_urls['original'], title)
+    meta_pages = json_result.illust.meta_pages
+    for i in tqdm(range(len(meta_pages)),
+                        desc = title + " downloading"):
+        download_url(meta_pages[i].image_urls['original'], title)
 
     info(title + " download complete!")
 
@@ -87,7 +89,7 @@ if __name__ == "__main__":
 
     else:
         while True:
-            illust_id = int(input())
+            illust_id = int(input("Please enter illust id:"))
             if illust_id != 0:
                 download_illust(illust_id)
             else:
