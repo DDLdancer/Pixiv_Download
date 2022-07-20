@@ -63,11 +63,20 @@ def download_author(author_id):
         download_illust(illust.id)
 
 
+def download_bookmark(user_id):
+    json_result = api.user_bookmarks_illust(user_id)
+    for illust in json_result.illusts[:]:
+        download_illust(illust.id)
+
+
 if __name__ == "__main__":
     authorization()
 
-    if len(sys.argv) >= 2:
+    if (len(sys.argv) >= 3) and (sys.argv[1] == "author"):
         download_author(int(sys.argv[2]))
+
+    elif (len(sys.argv) >= 3) and (sys.argv[1] == "bookmark"):
+        download_bookmark(int(sys.argv[2]))
 
     else:
         while True:
